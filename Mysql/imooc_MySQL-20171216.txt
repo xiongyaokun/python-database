@@ -1,0 +1,440 @@
+*****1-4 MySQL的登录与退出
+
+
+net start mysql57
+net stop mysql57
+
+mysql [参数]
+
+-D,--database=name   打开指定数据库
+
+-V,--version   查看版本
+
+-u, --user=name  用户名
+
+-p, --password  密码
+
+-P, --port=     端口号(默认3306)
+
+-h, --host=name  服务器名称(默认本地服务器)
+
+例如：mysql -uroot -proot -P3306 -h127.0.0.1
+
+*****退出命令：
+exit;
+quit;
+\q;
+
+*****修改提示符
+
+链接客户端时：mysql -uroot -p[password] --prompt 提示符
+链接上客户端后：prompt 提示符
+
+\D 完整的日期
+\d 数据库名称
+\h 主机名
+\u 用户名
+例如：
+prompt \u@\h \d
+
+
+*****修改结束符
+DELIMITER //
+DELIMITER ;
+
+
+*****常用命令
+SELECT VERSION();
+SELECT CURRENT_DATE();
+SELECT CURRENT_TIME();
+SELECT NOW();
+SELECT USER();
+关键字、函数名称大写
+数据库、表、字段名称小写
+SQL语句必须以分号结尾
+
+*****创建数据库
+CREATE {DATABASE | SCHEMA} [IF NOT EXISTS] db_name [DEFAULT] CHARACTER SET [=] charset_name
+
+例子：
+CREATE DATABASE t1;(默认的编码是urf8)
+CREATE DATABASE IF NOT EXISTS t2 CHARACTER SET gbk;
+
+***** 查看当前服务器下的数据列表
+SHOW {DATABASES | SCHEMAS} [LIKE 'pattern' | WHERE expr]
+
+***** 显示数据库的信息
+SHOW CREATE DATABASE {name of database};
+
+
+*****显示当前数据库名称
+SELECT DATABASE();
+
+
+***** 修改数据库
+ALTER {DATABASE | SCHEMA} [db_name] [DEFAULT] CHARACTER SET [=] charset_name
+
+***** 删除数据库
+DROP {DATABASE | SCHEMA} [IF EXISTS] db_name
+
+***** 显示警告信息
+SHOW WARNINGS;
+
+
+***** 整型  字节数
+TINYINT    1
+SMALLINT   2
+MEDIUMINT  3
+INT        4
+BIGINT     5
+
+***** 浮点型  M是数字总位数，D是小数点后面的位数
+FLOAT[(M,D)]   单精度
+DOUBLE[(M,D)]  双精度
+
+***** 日期时间类型
+YEAR       1
+TIME       3
+DATE       3
+DATETIME   8
+TIMESTAMP  4   [1970-01-01——2037]
+
+***** 字符型
+CHAR(M)         M个字节，0<=M<=255   定长类型，不足的用空格补充
+VARCHAR(M)      L+1个字节，其中L<=M 且 0<=M<=65535  变长类型
+TINYTEXT        L+1个字节，其中L<=2(8) 2的8次方
+TEXT            L+2个字节，其中L<=2(16)
+ENUM('value1', 'value2',......) 1或2个字节(最多65535个值)
+SET('value1', 'value2',......) 1、2、3、4、8个字节，取决于set成员的数目（最多64个成员）
+
+***** 操作数据表
+创建新的数据表：CREATE TABLE [IF NOT EXISTS] table_name (column_name data_type, ...);
+CREATE TABLE tb1 (username VARCHAR(20), age TINYINT UNSIGNED, salary FLOAT(7,2) UNSIGNED);
+查看创建数据表的信息
+SHOW CREATE TABLE {tb_name};
+
+
+***** 查看数据表列表
+SHOW TABLES [FROM db_name] [LIKE 'pattern' | WHERE expr]
+
+
+*****查看数据表结构
+SHOW COLUMNS FROM tb1;
+
+***** 插入记录
+INSERT [INTO] tbl_name [(col_name,...)] VALUES (values,...);
+
+INSERT tb1 VALUES('Tom', 25, 7863.25);
+INSERT tb1 (username, salary) VALUES ('John', 4500.69);
+
+
+*****记录查找
+SELECT expr,... FROM tbl_name;
+
+*****空值与非空
+NULL 字段值可以为空
+NOT NULL 字段值禁止为空
+
+
+*****AUTO_INCREMENT
+必须和PRIMARY_KEY一起使用
+CREATE TABLE tb3 ( id SAMLLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, username VARCHAR(20) NOT NULL);
+
+*****PRIMARY KEY
+可以单独使用
+每张表只能有一个主键
+主键保持记录的唯一性
+主键自动为NOT NULL
+CREATE TABLE tb4(id SMALLINT PRIMARY KEY, username VARCHAR(20) NOT NULL);
+
+
+*****UNIQUE_KEY
+唯一约束
+唯一约束可以保持记录的唯一性
+唯一约束的字段可以为空值 NULL
+每张数据表可以存在多个唯一约束
+
+CREATE TABLE tb5(id SMALLINT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(20) NOT NULL UNIQUE_KEY, age TINYINT UNSIGNED);
+如果插入两条同名的username，会报错！
+
+
+*****默认约束DEFAULT
+默认值
+CREATE TABLE tb6(id SMALLINT UNSIGNED ANTO_INCREMENT PRIMARY KEY, username VARCHAR(20) NOT NULL UNIQUE_KEY, sex ENUM('1','2','3') DEFAULT '3');
+
+
+****约束
+NOT NULL
+PRIMARY KEY
+DEFAULT
+UNIQUE
+FOREIGN KEY
+
+
+*****外键约束FOREIGN KEY
+1、字表和附表必须使用相同的存储引擎
+2、数据表的存储引擎只能为InnoDB
+3、
+
+
+*****编辑默认的数据表的默认存储引擎
+MySQL配置文件
+default-storage-engine=INNODB
+
+
+*****外键约束的参照操作
+CASCADE:从父表删除或者更新且自动删除或者更新字表中的匹配行
+SET NULL:从父表中删除或者过更新行，并设置子表中的外键列为NULL。如果使用该项，必须保证字表列没有指定NOT NULL
+RESTRICT:拒绝对父表的删除或过更新操作
+NO ACTION:标准SQL的关键字，在MySQL中与RESTRICT相同
+
+
+*********修改数据表
+
+*****添加单列
+ALTER TABLE tbl_name ADD [COLUMN] col_name column_definition [FIRST | AFTER col_name]
+
+*****添加多列
+ALTER TABLE tbl_name ADD [COLUMN] (col_name column_definition,...)   只能在表的后面添加多列
+
+
+*****删除单列
+ALTER TABLE tbl_name DROP [COLUMN] col_name
+*****删除多列
+ALTER TABLE tbl_name DROP col_name,DROP col_name
+
+
+*****修改约束
+
+*****添加主键约束
+ALTER TABLE tbl_name ADD [CONSTRAINT[symbol]] PRIMARY KEY [index_type] [index_col_name,...]
+添加字段id：
+ALTER TABLE users2 ADD id SMALLINT UNSIGNED;
+添加主键约束：
+ALTER TABLE users2 ADD CONSTRIANT PK_user2_id PRIMARY KEY (id);
+
+*****添加唯一约束
+ALTER TABLE tbl_name ADD [CONSTRAINT[symbol]] UNIQUE [INDEX | KEY] [index_name] [index_type] (index_col_name,...)
+ALTER TABLE users2 ADD UNIQUE (username);
+
+*****添加外键约束
+ALTER TABLE tbl_name ADD [CONSTRAINT[symbol]] FOREIGN KEY [index_name] (index_col_name,...) reference_definition
+ALTER TABLE users2 ADD FOREIGN KEY (pid) REFERENCE province (id);
+
+
+*****添加/删除默认约束
+ALTER TABLE tbl_name ALTER [COLUMN] col_name {SET DEFAULT liter | DROP DEFAULT}
+ALTER TABLE users2 ALTER age SET DEFAULT 15;
+ALTER TABLE users ALTER age DROP DEFAULT;
+
+*****查看约束的名字
+SHOW INDEXES FROM tbl_name;
+
+
+*****删除主键约束
+ALTER TABLE tbl_name DROP PRIMARY KEY
+ALTER TABLE users2 DROP PRIMARY KEY
+
+*****删除唯一约束
+ALTER TABLE tbl_name DROP {INDEX | KEY} UNIQUE index_name
+ALTER TABLE tbl_name DROP INDEX username;
+
+*****删除外键约束
+ALTER TABLE tbl_name DROP FOREIGN KEY fk_symbol
+ALTER TABLE users2 DROP FOREIGN KEY users2_ibfk_1;
+
+
+*****修改列定义
+ALTER TABLE tbl_name MODIFY [COLUMN] col_name column_definition [FIRST | AFTER col_name]
+ALTER TABLE users2 MODIFY id SAMLLINT UNSIGNED NOT NULL FIRST;
+
+*****修改列定义
+ALTER TABLE tbl_name CHANGE [COLUMN] col_name new_col_name column_definition [FIRST | AFTER col_name]
+ALTER TABLE users2 CHANGE pid p_id TINYINT UNSIGNED NOT NULL;
+
+*****修改数据表的名字
+ALTER TABLE tbl_name RENAME [TO | AS] new_name
+
+RENAME TABLE tbl_name TO new_tbl_name[,tbl_name2 TO new_tbl_name2]...  可以同时更改多张表
+
+
+
+============记录的操作
+
+
+
+*****插入记录
+INSERT [INTO] tbl_name [(col_name,...)] {VALUES | VALUE} ({expr | DEFAULT},...)   此方法可以一次插入多条记录
+INSERT users VALUES(DEFAULT,'Tom','123',3*7-5,1),(NULL,'Rose',md5('123'),DEFAULT,0);
+
+AUTO_INCREMTN 属性的字段可以使用NULL 进行赋值
+
+*****插入记录
+INSERT [INTO] tbl_name SET col_name={expr | DEFAULT},col_name={expr | DEFAULT},...   此方法可以使用子查询，一次只能插入一条记录
+
+INSERT users SET username='Ben',password='456';
+
+*****插入记录
+INSERT [INTO] tbl_name [(col_name,...)] SELECT ...          此方法将查询结果插入到指定数据表
+
+
+
+
+
+=============数据库的复制(好像不能用)
+1、表结构相同，且在同一数据库（如table1,table2）
+sql:	INSERT INTO table1 SELECT * From table2;   完全复制
+    	INSERT INTO table1 SELECT DISTINCT * FROM table2;    不复制重复记录
+	INSERT INTO table1 SELECT TOP 5 * FROM table2;    前5条记录
+	
+2、不在同一数据库中(如，db1 table1,db2 table2)
+sql:	INSERT INTO db1..table1 SELECT * FROM db2..table2;   完全复制
+	INSERT INTO db1..table1 SELECT DISTINCT * FROM db2..table2   不复制重复记录
+	INSERT INTO tdb1..table1 SELECT TOP 5 * FROM db2 table2;
+
+
+
+=============备份或导出整个数据库
+mysqldump -uroot -p test > test.sql
+
+=============备份或导出数据库中的一个表
+mysqldump -uroot -p phpmyadmin pma_bookmark > pma_bookmark.sql
+命令解释：
+mysqldump -u用户名 -p 数据库名 表名 > 导出的文件名.sql
+
+
+
+
+*****UPDATE
+UPDATE [LOW_PRIORITY] [IGNORE] table_reference SET col_name1={expr|DEFAULT}[,col_name2={expr2|DEFAULT}]... [WHERE where_condition]
+UPDATE users SET age = age + 5;
+UPDATE users SET age = age - id,sex = 0;
+UPDATE users SET age = age + 10 WHERE id % 2 = 0;
+
+
+*****表单记录删除——删除数据表中的行
+DELETE FROM tbl_name [WHERE where_condition]
+DELETE FROM users WHERE id = 6;
+删除后再插入记录时，id号是从末尾递增；而不是补充被删除的记录，希望大家注意；
+
+
+*****MySQL查询表达式
+SELECT select_expr [, select_expr...]
+[
+  FROM table_references
+  [WHERE where_condition]
+  [GROUP BY {col_name | position} [ASC | DESC],...]
+  [HAVING where_condition]
+  [ORDER BY {col_name | expr | position} [ASC | DESC],...]
+  [LIMIT {[offset,] row_count | row_count OFFSET offset}]
+]
+
+每一个表达式表示想要的一列，至少有一列，多个列之间以英文逗号间隔。
+星号（*）表示所有的列，tbl_name.*可以表示命名表的所有列。
+查询表达式可以使用[AS] alis_name为其赋予别名。
+别名可用于GROUP BY,ORDER BY 或 HAVING子句。
+
+
+SELECT username,id FROM users;
+SELECT users.id,users.username FROM users;   同时使用多张表时
+
+别名：
+SELECT id AS userid,username AS uname FROM users;
+
+
+*****MySQL WHERE语句查询
+
+*****MySQL GROUP BY语句对查新结果分组
+[GROUP BY {col_name | psition} [ASC | DESC],...]
+SELECT sex FROM users GROUP BY sex;
+SELECT sex FROM users GROUP BY 1;      1代表sex
+
+
+*****分组条件
+[HAVING where_condition]
+SELECT sex,age FROM users GROUP BY 1 HAVING age > 35;    age必须出现在SELECT后的字段中
+
+
+*****ORDER BY 对查询结果进行排序
+[ORDER BY {col_name | position | expr} [ASC | DESC],...]
+SECECT * FROM users ORDER BY id DESC;
+SELECT * FROM users ORDER BY age,id DESC;
+
+
+*****LIMIT限制查询数量
+[LIMIT {[offset,] row_count | row_count OFFSET offset}]
+SELECT * FROM users LIMIT 2;  返回前两条记录
+SELECT * FROM users LIMIT 2,2;  返回第3、4条记录
+
+
+*****INSERT [INTO] tbl_name SET col_name={expr | DEFAULT},...
+INSERT test(id) SELECT username FROM users WHERE age > 30;
+
+
+
+
+******SET NAMES gbk;  设置显示的编码格式，不影响原来数据的存储格式；
+
+
+
+==========子查询Subquery
+子查询是指嵌套在查询内部的查询，且必须始终出现在圆括号内。
+SELECT * FROM t1 WHERE col1=(SELECT col2 FROM t2);
+其中SELECT * FROM t1,称为Outer Query/Outer Statement
+SELECT col2 FROM t2,称为SubQuery
+*****子查询的返回值
+返回值可以是标量，一行，一列，或者是子查询。
+
+
+
+*****使用比较运算符的子查询
+operand comparasion_operator ANY (subquery)
+operand comparison_operator SOME (subquery)
+operand comparison_operator ALL (subquery)
+
+SELECT AVG(goods_price) FROM tdb_goods;
+SELECT ROUND(AVG(goods_price),2) FROM tdb_goods;  结果：5363.36
+SELECT goods_id,goods_name,goods_price FROM tdb_goods WHERE goods_price >= 5363.36;
+SELECT goods_id,goods_name,goods_price FROM tdb_goods WHERE goods_price >= (SELECT ROUND(AVG(goods_price),2) FROM tdb_goods);
+
+SELECT goods_id,goods_name,goods_price FROM tdb_goods WHERE goods_price >= ANY (SELECT goods_price FROM tdb_goods WHERE goods_cate = "超极本");
+
+
+*****由[NOT] IN/EXISTS引发的子查询
+
+operand comparison_operator [NOT] IN (subquery)
+
+
+*****INSERT...SELECT
+INSERT [INTO] tbl_name [(col_name,...)]
+SELECT...
+INSERT tdb_goods_cates(cate_name) SELECT goods_cate FROM tdb_goods GROUP BY goods_cate;
+
+*****多表更新
+UPDATE table_references
+SET col_name1 = {expr1 | DEFAULT}
+[, col_name2 = {expr2 | DEFAULT}]...
+[WHRER where_condition]
+
+UPDATE tdb_goods INNER JOIN tdb_goods_cates ON goods_cate = cate_name SET goods_cate = cate_id;
+
+
+*****多表更新之一步到位
+CREATE TABLE [IF NOT EXISTS] tbl_reference
+[(create_defination)]
+select_statement
+
+CREATE TABLE tdb_goods_brands(
+brand_id SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+brand_name VARCHAR(40) NOT NULL)
+SELECT brand_name FROM tdb_goods GROUP BY brand_name;
+
+
+=======修改表名
+ALTER TABLE old_name RENAME new_name;
+
+=======修改字段的数据类型
+ALTER TABLE tbl_name MODIFY col_name {defination_statement};
+
+=======修改字段名
+ALTER TABLE tbl_name CHANGE old_col_name new_col_name {defination_statement};

@@ -1,0 +1,68 @@
+windows下的安装文件是.msi文件
+
+
+1、GUI工具  C:\Program Files\MySQL\MySQL Workbench 6.3 CE\
+2、命令行启动：以管理员身份运行 net stop mysql57；net start mysql57
+3、win界面启动,控制面板-管理工具-服务
+
+4、MySQL
+username: root
+passw : 1081550124
+
+
+管理员方式：
+启动mysql:mysql -u root -p
+然后输入密码：
+
+
+5、修改MySQL提示符
+5.1 连接客户端时通过参数指定
+shell>mysql -uroot -p**** --prompt 提示符
+
+5.2 连接上客户端后，通过prompt 参数
+mysql > prompt 提示符
+
+\D 当前日期
+\d 当前数据库
+\h 服务器名
+\u 当前用户
+
+6、常用命令
+SELECT VERSION();
+SELECT NOW();
+SELECT USER();
+
+SHOW DATABASES;列出所有数据库
+
+SHOW TABLES;列出所有表
+
+SHOW COLUMNS FROM name; 列出表内字段结构
+
+SELECT * FROM tablename; 列出数据
+
+
+
+
+7、语句规范
+7.1、关键字与函数名全部大写
+7.2、数据库名称，表名称，字段名称小写
+7.3、SQL语句必须以分号结尾
+
+
+8、
+CREATE 创建数据库
+ALTER  修改数据库
+DROP   删除数据库
+USE    打开数据库
+
+9、
+DROP TABLE IF EXISTS `dd_name`;
+CREATE TABLE `dd_name`(
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`xs_name` varchar(255) DEFAULT NULL,
+`xs_author` varchar(255) DEFAULT NULL,
+`category` varchar(255) DEFAULT NULL,
+`name_id` varchar(255) DEFAULT NULL,
+PRIMARY KEY (`id`)
+)
+ENGINE = InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4;
